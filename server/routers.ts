@@ -112,6 +112,7 @@ export const appRouter = router({
       const updates = sortUpdatesNewestFirst(updateRows).slice(0, 5);
       return {
         project: { title: portalProject.title, currentBaseline: portalProject.currentBaseline, baselineUpdatedAt: portalProject.baselineUpdatedAt },
+        versions: versionStages,
         pages: allPages.map(toClientPage),
         attentionPages: allPages.filter(isAttentionItem).map(toClientPage),
         recentUpdates: updates.map(toClientUpdate),
