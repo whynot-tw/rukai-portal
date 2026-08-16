@@ -32,6 +32,8 @@ export const projectPages = mysqlTable("projectPages", {
   notes: text("notes"),
   pngUrl: text("pngUrl"),
   pngUpdatedAt: timestamp("pngUpdatedAt"),
+  assetVersion: varchar("assetVersion", { length: 64 }),
+  reviewStatus: varchar("reviewStatus", { length: 128 }).default("待校稿").notNull(),
   sortOrder: int("sortOrder").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

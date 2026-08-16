@@ -15,6 +15,13 @@
       "when": 1786852205550,
       "tag": "0001_graceful_ted_forrester",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1786903588462,
+      "tag": "0002_strong_bucky",
+      "breakpoints": true
     }
   ]
 }

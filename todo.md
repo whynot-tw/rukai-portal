@@ -107,10 +107,18 @@
 - [x] 在收到「確認開始 P01–P14 上傳測試」前，不執行任何 Portal 上傳、取代、刪除或修改；確認後僅處理 P01–P14，P15、P16 維持排除。
 - [x] 確認後依頁碼執行 P01–P14 上傳／取代、保留原有狀態、完成前台與管理員 QA 及 checkpoint 回報；14/14 成功、API 與前台桌機／手機 QA 通過。
 - [x] 逐頁重核 Google Sheet「最新頁序對照」與 P01–P14 Import Manifest，標出 Portal 既有標題／狀態衝突，不在未確認前改寫頁面 metadata；已建立 `p01-p14-reconcile-report.md`，判定為 `SOURCE_CONFLICT`。
-- [ ] 針對 P09–P13 建立圖片內容配對證據，確認檔名頁碼、前台卡片標題與 PNG 沒有錯置；原始圖面頁碼正確，但 API 交叉核對發現 Portal P09–P13 標題依序錯置，需另行確認 metadata 同步。
+- [x] 針對 P09–P13 建立圖片內容配對證據；原始圖面頁碼與主題已核對，前台／API 逐頁核對也已完成，結果確認 Portal P09–P13 標題與 PNG 主題依序錯置，需另行確認 metadata 同步。
 - [x] 以管理員後台抽查批次 PNG mapping 與前台顯示；管理員 QA 14/14 顯示已設定校稿圖，前台桌機／手機 14/14 縮圖可見，但 P09–P13 metadata／PNG 主題錯置仍待確認。
-- [ ] 以 Partial 狀態保存 P01–P14 批次 checkpoint，明確記錄 PNG mapping 已完成、P09–P13 metadata／PNG 主題錯置需另行確認，且不自行改寫 Portal metadata。
-- [ ] 以一般使用者前台逐頁驗證 P09–P13 卡片標題與對應 PNG 圖面主題一致，保存可檢查結果。
-- [ ] 將本批 P01–P14 上傳結果以 Partial 狀態建立新 checkpoint，記錄 SOURCE_CONFLICT、PNG mapping 已完成與 metadata 未同步。
-- [ ] 在 checkpoint 後回填 version id，並再次確認管理員後台與前台仍能讀到 14/14 PNG mapping。
-- [ ] 等待使用者確認是否依 Google Sheet「最新頁序對照」同步 P09–P13 Portal metadata；未確認前不修改標題、章節或排版／資產狀態。
+- [x] 以 Partial 狀態保存 P01–P14 批次 checkpoint，明確記錄 PNG mapping 已完成、P09–P13 metadata／PNG 主題錯置需另行確認，且不自行改寫 Portal metadata；version `20f55eab`。
+- [x] 以一般使用者前台逐頁驗證 P09–P13 卡片標題與對應 PNG 圖面主題；已保存圖面與 API／前台來源交叉核對結果，發現標題錯置並停止 metadata 自動修正。
+- [x] 將本批 P01–P14 上傳結果以 Partial 狀態建立新 checkpoint，記錄 SOURCE_CONFLICT、PNG mapping 已完成與 metadata 未同步；version `20f55eab`。
+- [x] 在 checkpoint 後回填 version id `20f55eab`，並再次確認管理員後台與前台 API 仍能讀到 P01–P14／14/14 PNG mapping；P09–P13 metadata 錯置仍保留待確認。
+- [x] 等待使用者確認是否依 Google Sheet「最新頁序對照」同步 P09–P13 Portal metadata；已收到明確確認並完成同步。
+- [x] 以一般使用者已登入前台輸出 P09–P13 每張卡片的頁碼、標題與縮圖／相簿資料，保存可檢查逐頁結果；`titleChecks` 已輸出，P09–P13 均有縮圖但標題與 PNG 主題依序錯置。
+- [x] 在 version `20f55eab` checkpoint 後重新執行管理員後台只讀 QA，確認 P01–P14 mapping 仍可在 `/admin` 讀到並保存結果；管理員登入 HTTP 200、`missingPages=[]`、`mappedCount=14`。
+- [x] 依使用者確認同步最新版本 P09–P13 metadata：頁面標題、章節／分類、排版狀態、資產狀況與備註，以 Google Sheet「最新頁序對照」為來源。
+- [x] 同步時保留 P09–P13 既有 PNG mapping、assetVersion、pngUpdatedAt 與 reviewStatus，不將圖片上傳自動改為已確認；migration 後五頁均為 `assetVersion=batch-20260819`、`reviewStatus=待校稿`，PNG URL、pngUpdatedAt 與 sortOrder 均保留。
+- [x] 完成 metadata 同步後，驗證 P01–P14、前台標題／縮圖、管理員 mapping 與權限，保存新 checkpoint；前台 14/14、管理員 14/14、型別檢查與 14 項 Vitest 通過。
+- [x] 為 projectPages 補上可驗證的 assetVersion 與 reviewStatus 欄位，並以 schema-first 方式完成安全 migration；migration `0002_strong_bucky.sql` 已套用，既有頁面 reviewStatus 預設為「待校稿」。
+- [x] 重新驗證 P09–P13 metadata 同步後的 pngUrl、pngUpdatedAt、assetVersion、reviewStatus 與 sortOrder，確認 metadata 同步不會覆寫校稿狀態；資料庫查詢與前台／管理員 QA 均通過。
+- [x] 保存並發布 P09–P13 metadata 同步、assetVersion／reviewStatus migration 與完整 QA 的新 checkpoint，記錄可繼續校稿條件。
