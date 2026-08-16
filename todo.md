@@ -83,3 +83,23 @@
 - [x] 以已登入桌機 session 量測版本卡片、時間軸節點與文字區塊的 DOM 座標，確認沒有實際重疊並保存結果；`cards=4`、`line` 存在、`nodeTextOverlap=false`、`cardOverlap=false`。
 - [x] 移除 V1–V4 版本歷程的時間軸連線與節點，恢復上一版單純黑色卡片排列。
 - [x] 驗證桌機與手機版恢復單純卡片後的版面，並保存回復版本 checkpoint；兩種 viewport 均確認 `cards=4`、`absoluteElements=0`、`overlap=false`。
+- [x] 建立「魯凱手冊 Portal 批次匯入與發布」專屬技能，整理 Google Drive PNG 核對、Portal 更新、QA 與 checkpoint 流程。
+- [x] 依技能規範初始化並驗證 SKILL.md，交付可加入個人技能庫的專屬技能檔案；`quick_validate.py` 驗證通過。
+- [x] 將固定檔名與發布規則寫入專屬技能，明確定義頁碼、版本、狀態與可匯入條件。
+- [x] 將 Import Manifest 規則與匯入前禁止寫入閘門寫入專屬技能。
+- [x] 將缺頁不得自動刪除、撤回與明確刪除的處理規則寫入專屬技能。
+- [x] 將 Asset Version 與 Review Status 分離，並定義新增／替換後預設待校稿規則。
+- [x] 將固定 Checkpoint Markdown 模板與完整／部分／未執行結果格式寫入專屬技能，完成驗證後交付更新技能；技能 221 行，`quick_validate.py` 通過。
+- [x] 將三道執行閘門規則寫入專屬技能：匯入前、變更執行、發布後。
+- [x] 將 mapping 優先順序與無法唯一判定時的 Needs Confirmation 規則寫入專屬技能。
+- [x] 將缺頁、頁序風險、整批版本不完整與來源衝突的批次級警示規則寫入專屬技能。
+- [x] 將 Complete／Partial／Not Executed 與「是否可繼續校稿」回報規則寫入專屬技能，完成驗證後交付更新技能；技能 361 行，`quick_validate.py` 通過。
+- [x] 唯讀檢查 PORTAL_TEST_BASE_URL、PORTAL_ACCESS_PASSWORD、PORTAL_ADMIN_PASSWORD 是否 set，不顯示值；結果為 TEST_BASE unset、ACCESS set、ADMIN set。
+- [x] 使用既有設定測試客戶與管理員登入，並讀取 P01–P14；客戶與管理員 HTTP 200 登入成功，唯讀查詢未執行任何寫入或密碼變更。
+- [x] 依指定欄位回報 Portal URL、環境變數狀態、登入結果、P01–P14 讀取結果及錯誤原因；dashboard HTTP 200，P01–P13 存在，P14 未找到。
+- [x] 排查 P14 是否缺於資料庫、Portal 內容、dashboard API 或前台轉換，確認真實來源與缺失原因；確認資料庫原本只有 P01–P13，Google Sheet 最新頁序對照含 P14。
+- [x] 只在有可靠來源或既有資料可恢復時修復 P14，禁止捏造頁面內容；依 Google Sheet 補回 P14，型別檢查與 14 項 Vitest 通過。
+- [x] 完成 P14 dashboard、前台與校稿相簿驗證後保存 checkpoint；正式 Portal 客戶／管理員登入 HTTP 200，dashboard P01–P14 全部讀取成功。
+- [x] 以一般使用者瀏覽器 session 實測首頁／頁面預覽，確認 P14 出現在前台清單並保存可檢查證據；手機 QA 確認 `p14Visible=true`。
+- [x] 依 P14 目前無 PNG 狀態，確認前台顯示正確 placeholder 且不會錯誤開啟校稿相簿；`hasPlaceholder=true`、`p14GalleryTrigger=false`。
+- [x] 完成 P14 前台驗證後建立新的 checkpoint，再完成 P14 修復收尾。
