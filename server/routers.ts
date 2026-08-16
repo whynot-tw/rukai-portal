@@ -1,42 +1,37 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { ENV } from "./_core/env";
-import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router } from "./_core/trpc";
+import { getSessionCookieOptions } from "./_core/cookies";
+import { systemRouter } from "./_core/systemRouter";
+import { COOKIE_NAME } from "@shared/const";
 import {
-  getAllowedEmail,
-  listAllowedEmails,
   listPages,
   listUpdates,
   listWeeklySnapshots,
-  saveAllowedEmail,
   savePage,
   saveUpdate,
   saveWeeklySnapshot,
-  setAllowedEmailActive,
 } from "./db";
 import { portalProject, versionStages } from "./portalContent";
-import { resolveWhitelistAccess, sortUpdatesNewestFirst, summarizePages } from "../shared/portal";
-import { COOKIE_NAME } from "@shared/const";
-import { getSessionCookieOptions } from "./_core/cookies";
-import { systemRouter } from "./_core/systemRouter";
+import {
+  createPortalSession,
+  hasValidPortalSession,
+  PORTAL_SESSION_COOKIE,
+  PORTAL_SESSION_MAX_AGE_MS,
+  readCookie,
+  verifyPortalPassword,
+} from "./passwordAuth";
+import { sortUpdatesNewestFirst, summarizePages } from "../shared/portal";
 
-async function resolveAccess(user: { openId: string; email: string | null }) {
-  const allowed = user.email ? await getAllowedEmail(user.email) : null;
-  return resolveWhitelistAccess({
-    isOwner: user.openId === ENV.ownerOpenId,
-    record: allowed ? { isActive: allowed.isActive, role: allowed.role } : null,
-  });
+async function hasPortalAccess(req: { headers: { cookie?: string } }) {
+  const token = readCookie(req.headers.cookie, PORTAL_SESSION_COOKIE);
+  return hasValidPortalSession(token);
 }
 
-async function requirePortalAccess(user: { openId: string; email: string | null }) {
-  const access = await resolveAccess(user);
-  if (!access.allowed) throw new TRPCError({ code: "FORBIDDEN", message: "此帳號尚未獲得 Portal 存取權限。" });
-  return access;
-}
-
-async function requireAdminAccess(user: { openId: string; email: string | null }) {
-  const access = await requirePortalAccess(user);
-  if (access.role !== "admin") throw new TRPCError({ code: "FORBIDDEN", message: "僅限管理員操作。" });
+async function requirePortalAccess(req: { headers: { cookie?: string } }) {
+  if (!(await hasPortalAccess(req))) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "請先輸入專案存取密碼。" });
+  }
 }
 
 const pageInput = z.object({
@@ -75,18 +70,35 @@ const weeklyInput = z.object({
 
 export const appRouter = router({
   system: systemRouter,
+  // 保留模板既有 auth 端點以支援未使用的框架元件；Portal 存取不依賴此帳號資訊。
   auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+    me: publicProcedure.query(({ ctx }) => ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      ctx.res.clearCookie(COOKIE_NAME, { ...getSessionCookieOptions(ctx.req), maxAge: -1 });
       return { success: true } as const;
     }),
   }),
   portal: router({
-    access: protectedProcedure.query(async ({ ctx }) => resolveAccess(ctx.user)),
-    dashboard: protectedProcedure.query(async ({ ctx }) => {
-      await requirePortalAccess(ctx.user);
+    passwordStatus: publicProcedure.query(async ({ ctx }) => ({ authenticated: await hasPortalAccess(ctx.req) })),
+    passwordLogin: publicProcedure
+      .input(z.object({ password: z.string().min(1).max(256) }))
+      .mutation(async ({ ctx, input }) => {
+        if (!verifyPortalPassword(input.password)) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "密碼不正確，請再試一次。" });
+        }
+        const token = await createPortalSession();
+        ctx.res.cookie(PORTAL_SESSION_COOKIE, token, {
+          ...getSessionCookieOptions(ctx.req),
+          maxAge: PORTAL_SESSION_MAX_AGE_MS,
+        });
+        return { success: true };
+      }),
+    passwordLogout: publicProcedure.mutation(({ ctx }) => {
+      ctx.res.clearCookie(PORTAL_SESSION_COOKIE, { ...getSessionCookieOptions(ctx.req), maxAge: -1 });
+      return { success: true };
+    }),
+    dashboard: publicProcedure.query(async ({ ctx }) => {
+      await requirePortalAccess(ctx.req);
       const [pages, updateRows, snapshots] = await Promise.all([listPages(), listUpdates(8), listWeeklySnapshots()]);
       const updates = sortUpdatesNewestFirst(updateRows);
       return {
@@ -99,50 +111,31 @@ export const appRouter = router({
         summary: summarizePages(pages),
       };
     }),
-    updates: protectedProcedure.query(async ({ ctx }) => {
-      await requirePortalAccess(ctx.user);
+    updates: publicProcedure.query(async ({ ctx }) => {
+      await requirePortalAccess(ctx.req);
       return sortUpdatesNewestFirst(await listUpdates());
     }),
-    needsAttention: protectedProcedure.query(async ({ ctx }) => {
-      await requirePortalAccess(ctx.user);
+    needsAttention: publicProcedure.query(async ({ ctx }) => {
+      await requirePortalAccess(ctx.req);
       return listPages();
     }),
-    adminData: protectedProcedure.query(async ({ ctx }) => {
-      await requireAdminAccess(ctx.user);
-      const [pages, updates, snapshots, emails] = await Promise.all([
-        listPages(),
-        listUpdates(),
-        listWeeklySnapshots(),
-        listAllowedEmails(),
-      ]);
-      return { pages, updates, snapshots, emails };
+    adminData: publicProcedure.query(async ({ ctx }) => {
+      await requirePortalAccess(ctx.req);
+      const [pages, updates, snapshots] = await Promise.all([listPages(), listUpdates(), listWeeklySnapshots()]);
+      return { pages, updates: sortUpdatesNewestFirst(updates), snapshots };
     }),
-    savePage: protectedProcedure.input(pageInput).mutation(async ({ ctx, input }) => {
-      await requireAdminAccess(ctx.user);
+    savePage: publicProcedure.input(pageInput).mutation(async ({ ctx, input }) => {
+      await requirePortalAccess(ctx.req);
       return { id: await savePage({ ...input, pngUpdatedAt: input.pngUrl ? new Date() : null }) };
     }),
-    saveUpdate: protectedProcedure.input(updateInput).mutation(async ({ ctx, input }) => {
-      await requireAdminAccess(ctx.user);
+    saveUpdate: publicProcedure.input(updateInput).mutation(async ({ ctx, input }) => {
+      await requirePortalAccess(ctx.req);
       return { id: await saveUpdate(input) };
     }),
-    saveWeeklySnapshot: protectedProcedure.input(weeklyInput).mutation(async ({ ctx, input }) => {
-      await requireAdminAccess(ctx.user);
+    saveWeeklySnapshot: publicProcedure.input(weeklyInput).mutation(async ({ ctx, input }) => {
+      await requirePortalAccess(ctx.req);
       return { id: await saveWeeklySnapshot(input) };
     }),
-    saveAllowedEmail: protectedProcedure
-      .input(z.object({ email: z.string().trim().email(), role: z.enum(["client", "admin"]), isActive: z.boolean() }))
-      .mutation(async ({ ctx, input }) => {
-        await requireAdminAccess(ctx.user);
-        await saveAllowedEmail(input);
-        return { success: true };
-      }),
-    setAllowedEmailActive: protectedProcedure
-      .input(z.object({ id: z.number().int().positive(), isActive: z.boolean() }))
-      .mutation(async ({ ctx, input }) => {
-        await requireAdminAccess(ctx.user);
-        await setAllowedEmailActive(input.id, input.isActive);
-        return { success: true };
-      }),
   }),
 });
 

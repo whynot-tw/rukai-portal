@@ -9,17 +9,9 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Updates from "./pages/Updates";
 
-function ProtectedHome() {
-  return <PortalGate><Home /></PortalGate>;
-}
-
-function ProtectedAdmin() {
-  return <PortalGate adminOnly><Admin /></PortalGate>;
-}
-
-function ProtectedUpdates() {
-  return <PortalGate><Updates /></PortalGate>;
-}
+function ProtectedHome() { return <PortalGate><Home /></PortalGate>; }
+function ProtectedAdmin() { return <PortalGate><Admin /></PortalGate>; }
+function ProtectedUpdates() { return <PortalGate><Updates /></PortalGate>; }
 
 function Router() {
   return <Switch><Route path="/" component={ProtectedHome} /><Route path="/updates" component={ProtectedUpdates} /><Route path="/admin" component={ProtectedAdmin} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>;

@@ -1,41 +1,36 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { TrpcContext } from "./_core/context";
+import { PORTAL_SESSION_COOKIE } from "./passwordAuth";
 
 const dbMocks = vi.hoisted(() => ({
-  getAllowedEmail: vi.fn(),
-  listAllowedEmails: vi.fn(),
   listPages: vi.fn(),
   listUpdates: vi.fn(),
   listWeeklySnapshots: vi.fn(),
-  saveAllowedEmail: vi.fn(),
   savePage: vi.fn(),
   saveUpdate: vi.fn(),
   saveWeeklySnapshot: vi.fn(),
-  setAllowedEmailActive: vi.fn(),
 }));
 
 vi.mock("./db", () => dbMocks);
 
 import { appRouter } from "./routers";
 
-type Role = "admin" | "user";
+type CookieCall = { name: string; value?: string; options: Record<string, unknown> };
 
-function createContext(email: string, openId = "not-the-owner", role: Role = "user") {
-  return {
-    user: {
-      id: 99,
-      openId,
-      email,
-      name: "Test User",
-      loginMethod: "manus",
-      role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      lastSignedIn: new Date(),
-    },
-    req: {} as TrpcContext["req"],
-    res: {} as TrpcContext["res"],
-  } as TrpcContext;
+function createContext(session?: string) {
+  const cookies: CookieCall[] = [];
+  const ctx = {
+    user: null,
+    req: {
+      protocol: "https",
+      headers: session ? { cookie: `${PORTAL_SESSION_COOKIE}=${encodeURIComponent(session)}` } : {},
+    } as TrpcContext["req"],
+    res: {
+      cookie: (name: string, value: string, options: Record<string, unknown>) => cookies.push({ name, value, options }),
+      clearCookie: (name: string, options: Record<string, unknown>) => cookies.push({ name, options }),
+    } as TrpcContext["res"],
+  };
+  return { ctx, cookies };
 }
 
 const validPage = {
@@ -49,86 +44,51 @@ const validPage = {
   sortOrder: 14,
 };
 
-const validUpdate = {
-  displayDate: "2026/08/03",
-  scope: "第二章",
-  updateType: "頁序確認",
-  summary: "測試更新摘要",
-  affectedPages: "P14–P20",
-  status: "待確認",
-};
-
-const validWeeklySnapshot = {
-  weekOf: "2026/08/03",
-  completedChapters: "第二章",
-  completedPages: "P14–P20",
-  latestPageOrder: "0803 確認頁序",
-  newConfirmations: "P20 圖片待確認",
-  resolvedItems: "P14 頁碼修正",
-  versionChanges: "V3",
-  nextStage: "補足素材",
-};
-
-describe("Portal 受保護程序", () => {
+describe("Portal 單一密碼存取", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    dbMocks.getAllowedEmail.mockResolvedValue(null);
   });
 
-  it("拒絕未列入白名單的使用者讀取 Portal", async () => {
-    const caller = appRouter.createCaller(createContext("unknown@example.com"));
-    await expect(caller.portal.dashboard()).rejects.toMatchObject({ code: "FORBIDDEN" });
+  it("接受設定的專案密碼並建立 httpOnly session cookie", async () => {
+    const configuredPassword = process.env.PORTAL_ACCESS_PASSWORD ?? "";
+    expect(configuredPassword.length).toBeGreaterThan(0);
+
+    const { ctx, cookies } = createContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.portal.passwordLogin({ password: configuredPassword })).resolves.toEqual({ success: true });
+    expect(cookies[0]?.name).toBe(PORTAL_SESSION_COOKIE);
+    expect(cookies[0]?.value).toBeTruthy();
+    expect(cookies[0]?.options).toMatchObject({ httpOnly: true, secure: true });
   });
 
-  it("允許白名單閱讀者查看內容，但拒絕其讀取管理資料與寫入頁面", async () => {
-    dbMocks.getAllowedEmail.mockResolvedValue({ isActive: true, role: "client" });
+  it("拒絕錯誤密碼與沒有 session 的資料請求", async () => {
+    const { ctx } = createContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.portal.passwordLogin({ password: "incorrect-password" })).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+    await expect(caller.portal.dashboard()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+    await expect(caller.portal.savePage(validPage)).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  });
+
+  it("允許擁有有效 session 的訪客讀取與維護 Portal 資料", async () => {
+    const configuredPassword = process.env.PORTAL_ACCESS_PASSWORD ?? "";
+    const login = createContext();
+    await appRouter.createCaller(login.ctx).portal.passwordLogin({ password: configuredPassword });
+    const session = login.cookies[0]?.value;
+    expect(session).toBeTruthy();
+
     dbMocks.listPages.mockResolvedValue([]);
     dbMocks.listUpdates.mockResolvedValue([]);
     dbMocks.listWeeklySnapshots.mockResolvedValue([]);
-    const caller = appRouter.createCaller(createContext("client@example.com"));
-
-    await expect(caller.portal.dashboard()).resolves.toMatchObject({ summary: { completed: 0 } });
-    await expect(caller.portal.adminData()).rejects.toMatchObject({ code: "FORBIDDEN" });
-    await expect(caller.portal.savePage(validPage)).rejects.toMatchObject({ code: "FORBIDDEN" });
-    await expect(caller.portal.saveUpdate(validUpdate)).rejects.toMatchObject({ code: "FORBIDDEN" });
-    await expect(caller.portal.saveWeeklySnapshot(validWeeklySnapshot)).rejects.toMatchObject({ code: "FORBIDDEN" });
-    await expect(caller.portal.saveAllowedEmail({ email: "new@example.com", role: "client", isActive: true })).rejects.toMatchObject({ code: "FORBIDDEN" });
-    await expect(caller.portal.setAllowedEmailActive({ id: 1, isActive: false })).rejects.toMatchObject({ code: "FORBIDDEN" });
-  });
-
-  it("允許白名單管理員寫入所有管理資料", async () => {
-    dbMocks.getAllowedEmail.mockResolvedValue({ isActive: true, role: "admin" });
     dbMocks.savePage.mockResolvedValue(14);
-    dbMocks.saveUpdate.mockResolvedValue(15);
-    dbMocks.saveWeeklySnapshot.mockResolvedValue(16);
-    const caller = appRouter.createCaller(createContext("admin@example.com"));
-
+    const caller = appRouter.createCaller(createContext(session).ctx);
+    await expect(caller.portal.dashboard()).resolves.toMatchObject({ summary: { completed: 0 } });
     await expect(caller.portal.savePage(validPage)).resolves.toEqual({ id: 14 });
-    await expect(caller.portal.saveUpdate(validUpdate)).resolves.toEqual({ id: 15 });
-    await expect(caller.portal.saveWeeklySnapshot(validWeeklySnapshot)).resolves.toEqual({ id: 16 });
-    await expect(caller.portal.saveAllowedEmail({ email: "new@example.com", role: "client", isActive: true })).resolves.toEqual({ success: true });
-    await expect(caller.portal.setAllowedEmailActive({ id: 1, isActive: false })).resolves.toEqual({ success: true });
-    expect(dbMocks.savePage).toHaveBeenCalledWith(expect.objectContaining({ pageNumber: "P14", sortOrder: 14 }));
-    expect(dbMocks.saveUpdate).toHaveBeenCalledWith(expect.objectContaining({ updateType: "頁序確認" }));
-    expect(dbMocks.saveWeeklySnapshot).toHaveBeenCalledWith(expect.objectContaining({ weekOf: "2026/08/03" }));
-    expect(dbMocks.saveAllowedEmail).toHaveBeenCalledWith({ email: "new@example.com", role: "client", isActive: true });
-    expect(dbMocks.setAllowedEmailActive).toHaveBeenCalledWith(1, false);
   });
 
-  it("向已授權閱讀者提供完整更新歷史，而不是首頁摘要的八筆限制", async () => {
-    dbMocks.getAllowedEmail.mockResolvedValue({ isActive: true, role: "client" });
-    dbMocks.listUpdates.mockResolvedValue([
-      { id: 7, displayDate: "2026/07/31" },
-      { id: 9, displayDate: "2026/08/03" },
-      { id: 8, displayDate: "2026/08/01" },
-    ]);
-    const caller = appRouter.createCaller(createContext("client@example.com"));
-
-    await expect(caller.portal.updates()).resolves.toEqual([
-      { id: 9, displayDate: "2026/08/03" },
-      { id: 8, displayDate: "2026/08/01" },
-      { id: 7, displayDate: "2026/07/31" },
-    ]);
-    expect(dbMocks.listUpdates).toHaveBeenCalledWith();
+  it("可清除專案 session 以登出", async () => {
+    const { ctx, cookies } = createContext("temporary-session");
+    await expect(appRouter.createCaller(ctx).portal.passwordLogout()).resolves.toEqual({ success: true });
+    expect(cookies[0]?.name).toBe(PORTAL_SESSION_COOKIE);
+    expect(cookies[0]?.options).toMatchObject({ maxAge: -1 });
   });
 });

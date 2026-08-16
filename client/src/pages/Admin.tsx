@@ -2,7 +2,7 @@ import { PortalHeader } from "@/components/PortalHeader";
 import { StatusPill } from "@/components/StatusPill";
 import { trpc } from "@/lib/trpc";
 import { ASSET_STATUS_OPTIONS, PAGE_STATUS_OPTIONS } from "@shared/portal";
-import { Check, FileImage, ListPlus, Loader2, Mail, PencilLine, Save, ShieldCheck } from "lucide-react";
+import { FileImage, KeyRound, ListPlus, Loader2, PencilLine, Save, ShieldCheck } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -22,17 +22,13 @@ export default function Admin() {
   const [pageForm, setPageForm] = useState(blankPage);
   const [updateForm, setUpdateForm] = useState(blankUpdate);
   const [weeklyForm, setWeeklyForm] = useState(blankWeekly);
-  const [email, setEmail] = useState("");
-  const [emailRole, setEmailRole] = useState<"client" | "admin">("client");
 
   const invalidate = async () => {
-    await Promise.all([utils.portal.adminData.invalidate(), utils.portal.dashboard.invalidate(), utils.portal.access.invalidate()]);
+    await Promise.all([utils.portal.adminData.invalidate(), utils.portal.dashboard.invalidate()]);
   };
   const pageMutation = trpc.portal.savePage.useMutation({ onSuccess: async () => { toast.success("頁面資料已儲存"); setPageForm(blankPage); await invalidate(); }, onError: (error) => toast.error(error.message) });
   const updateMutation = trpc.portal.saveUpdate.useMutation({ onSuccess: async () => { toast.success("更新紀錄已儲存"); setUpdateForm(blankUpdate); await invalidate(); }, onError: (error) => toast.error(error.message) });
   const weeklyMutation = trpc.portal.saveWeeklySnapshot.useMutation({ onSuccess: async () => { toast.success("週進度已儲存"); setWeeklyForm(blankWeekly); await invalidate(); }, onError: (error) => toast.error(error.message) });
-  const emailMutation = trpc.portal.saveAllowedEmail.useMutation({ onSuccess: async () => { toast.success("白名單已更新"); setEmail(""); await invalidate(); }, onError: (error) => toast.error(error.message) });
-  const activeMutation = trpc.portal.setAllowedEmailActive.useMutation({ onSuccess: invalidate, onError: (error) => toast.error(error.message) });
 
   useEffect(() => {
     if (data?.pages?.length && pageForm.sortOrder === 0 && !pageForm.id) setPageForm((form) => ({ ...form, sortOrder: Math.max(...data.pages.map((page) => page.sortOrder)) + 1 }));
@@ -58,7 +54,7 @@ export default function Admin() {
         <section className="border border-[#ded5c9] bg-[#fffdf9] p-5 sm:p-7"><p className="text-xs font-semibold tracking-[0.15em] text-[#8d3131]">WEEKLY SNAPSHOT</p><h2 className="mt-2 font-serif text-2xl">每週進度</h2><div className="mt-6 grid gap-4 sm:grid-cols-2"><Field label="載入週進度"><select className={inputClass} value={weeklyForm.id ?? "new"} onChange={(event) => { const found = data.snapshots.find((snapshot) => snapshot.id === Number(event.target.value)); setWeeklyForm(found ? { id: found.id, weekOf: found.weekOf, completedChapters: found.completedChapters, completedPages: found.completedPages, latestPageOrder: found.latestPageOrder, newConfirmations: found.newConfirmations, resolvedItems: found.resolvedItems, versionChanges: found.versionChanges, nextStage: found.nextStage } : blankWeekly); }}><option value="new">新增週進度</option>{data.snapshots.map((snapshot) => <option key={snapshot.id} value={snapshot.id}>{snapshot.weekOf}</option>)}</select></Field><Field label="週進度日期"><input className={inputClass} value={weeklyForm.weekOf} onChange={(event) => setWeeklyForm({ ...weeklyForm, weekOf: event.target.value })} placeholder="YYYY/MM/DD" /></Field>{[["本週完成章節", "completedChapters"], ["本週完成頁面", "completedPages"], ["目前最新頁序", "latestPageOrder"], ["新增待確認", "newConfirmations"], ["已解決項目", "resolvedItems"], ["本週版本異動", "versionChanges"], ["下一階段", "nextStage"]].map(([label, key]) => <Field key={key} label={label}><textarea className={`${inputClass} min-h-20`} value={weeklyForm[key as keyof typeof weeklyForm] as string} onChange={(event) => setWeeklyForm({ ...weeklyForm, [key]: event.target.value })} /></Field>)}</div><button onClick={() => weeklyMutation.mutate(weeklyForm)} disabled={weeklyMutation.isPending} className="mt-6 inline-flex items-center gap-2 bg-[#292621] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#8d3131] disabled:opacity-50"><Save className="h-4 w-4" />儲存週進度</button></section>
       </div>
 
-      <section className="mt-7 border border-[#ded5c9] bg-[#fffdf9] p-5 sm:p-7"><div className="flex items-center gap-3"><Mail className="h-6 w-6 text-[#8d3131]" /><div><p className="text-xs font-semibold tracking-[0.15em] text-[#8d3131]">ACCESS CONTROL</p><h2 className="mt-1 font-serif text-2xl">Email 白名單</h2></div></div><div className="mt-6 grid gap-3 md:grid-cols-[1fr_160px_auto]"><input className={inputClass} type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="client@example.com" /><select className={inputClass} value={emailRole} onChange={(event) => setEmailRole(event.target.value as "client" | "admin")}><option value="client">委託方／閱讀者</option><option value="admin">管理員</option></select><button onClick={() => emailMutation.mutate({ email, role: emailRole, isActive: true })} disabled={!email || emailMutation.isPending} className="inline-flex items-center justify-center gap-2 bg-[#8d3131] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#692323] disabled:opacity-50"><Check className="h-4 w-4" />加入／更新</button></div><div className="mt-6 divide-y divide-[#e3dbd1] border-y border-[#e3dbd1]">{data.emails.length ? data.emails.map((record) => <div key={record.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{record.email}</p><p className="mt-1 text-xs text-[#746a5f]">{record.role === "admin" ? "管理員" : "委託方／閱讀者"}</p></div><button onClick={() => activeMutation.mutate({ id: record.id, isActive: !record.isActive })} className={`border px-3 py-2 text-xs font-semibold ${record.isActive ? "border-[#a8b8a5] bg-[#edf3eb] text-[#486143]" : "border-[#e1b1ac] bg-[#fff0ee] text-[#8d3131]"}`}>{record.isActive ? "已啟用（點擊停用）" : "已停用（點擊啟用）"}</button></div>) : <p className="py-7 text-sm text-[#746a5f]">目前尚無額外白名單資料；專案擁有者仍保有管理員權限。</p>}</div></section>
+      <section className="mt-7 border border-[#ded5c9] bg-[#fffdf9] p-5 sm:p-7"><div className="flex items-center gap-3"><KeyRound className="h-6 w-6 text-[#8d3131]" /><div><p className="text-xs font-semibold tracking-[0.15em] text-[#8d3131]">ACCESS CONTROL</p><h2 className="mt-1 font-serif text-2xl">單一專案密碼</h2></div></div><p className="mt-5 max-w-3xl leading-7 text-[#746a5f]">目前 Portal 不使用 Manus 帳號、Google 帳號或 Email 白名單。所有持有專案密碼的成員皆可瀏覽工作紀錄與使用本頁資料管理功能；若需停止存取，請由網站設定更新專案密碼並重新通知獲授權成員。</p></section>
     </main></div>
   );
 }
