@@ -28,6 +28,19 @@ if (!authenticatedStatus.ok || !authenticatedBody.includes('"authenticated":true
 const dashboardUrl = `${baseUrl}/api/trpc/portal.dashboard?batch=1&input=${encodeURIComponent(trpcInput(null))}`;
 const dashboard = await fetch(dashboardUrl, { headers: { cookie } });
 if (!dashboard.ok) throw new Error(`Protected dashboard returned ${dashboard.status}`);
+const dashboardPayload = JSON.parse(await dashboard.text())[0]?.result?.data?.json;
+if (dashboardPayload?.pages?.length !== 13) throw new Error("Expected 13 imported project pages");
+if (dashboardPayload?.updates?.length !== 5) throw new Error("Expected 5 imported update records");
+const mappedProofs = dashboardPayload.pages.filter((page) => page.pngUrl);
+if (mappedProofs.length !== 2 || !mappedProofs.some((page) => page.pageNumber === "P10") || !mappedProofs.some((page) => page.pageNumber === "P11")) {
+  throw new Error("Expected verified PNG mappings for P10 and P11");
+}
+for (const proof of mappedProofs) {
+  const image = await fetch(`${baseUrl}${proof.pngUrl}`, { headers: { cookie } });
+  if (!image.ok || !image.headers.get("content-type")?.startsWith("image/png")) {
+    throw new Error(`Verified PNG failed to load for ${proof.pageNumber}`);
+  }
+}
 
 const logout = await fetch(`${baseUrl}/api/trpc/portal.passwordLogout?batch=1`, {
   method: "POST",
@@ -38,4 +51,4 @@ if (!logout.ok || !logout.headers.get("set-cookie")?.includes("Max-Age=-1")) {
   throw new Error("Password logout did not clear the session cookie");
 }
 
-console.log("Password flow verified: login, session, protected dashboard, and logout.");
+console.log("Password flow verified: login, session, 13 imported pages, 5 updates, 2 PNGs, and logout.");

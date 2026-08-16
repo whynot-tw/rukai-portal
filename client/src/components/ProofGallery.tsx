@@ -1,12 +1,7 @@
 import { ChevronLeft, ChevronRight, Maximize2, Minus, Plus, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type GalleryPage = {
-  id: number;
-  pageNumber: string;
-  title: string;
-  pngUrl: string | null;
-};
+type GalleryPage = { id: number; pageNumber: string; title: string; pngUrl: string | null };
 
 export function ProofGallery({ pages, initialPageId, onClose }: { pages: GalleryPage[]; initialPageId: number; onClose: () => void }) {
   const galleryPages = useMemo(() => pages.filter((page) => Boolean(page.pngUrl)), [pages]);
@@ -15,63 +10,10 @@ export function ProofGallery({ pages, initialPageId, onClose }: { pages: Gallery
   const [zoom, setZoom] = useState(1);
   const touchStart = useRef<number | null>(null);
   const current = galleryPages[index];
+  const go = (direction: -1 | 1) => { setIndex((value) => Math.min(Math.max(value + direction, 0), galleryPages.length - 1)); setZoom(1); };
 
-  const go = (direction: -1 | 1) => {
-    setIndex((value) => Math.min(Math.max(value + direction, 0), galleryPages.length - 1));
-    setZoom(1);
-  };
-
-  useEffect(() => {
-    const keydown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-      if (event.key === "ArrowLeft") go(-1);
-      if (event.key === "ArrowRight") go(1);
-    };
-    document.addEventListener("keydown", keydown);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", keydown);
-      document.body.style.overflow = "";
-    };
-  }, [index, galleryPages.length, onClose]);
-
+  useEffect(() => { const keydown = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); if (event.key === "ArrowLeft") go(-1); if (event.key === "ArrowRight") go(1); }; document.addEventListener("keydown", keydown); document.body.style.overflow = "hidden"; return () => { document.removeEventListener("keydown", keydown); document.body.style.overflow = ""; }; }, [index, galleryPages.length, onClose]);
   if (!current) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#171512]/[0.98] text-[#fffaf2]" role="dialog" aria-modal="true" aria-label="校稿相簿">
-      <header className="flex items-center justify-between px-4 py-4 sm:px-7">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.18em] text-[#e4b8a8]">PROOF GALLERY</p>
-          <p className="mt-1 text-sm text-[#d9d0c4]">{current.pageNumber} / {galleryPages.length}　{current.title}</p>
-        </div>
-        <button onClick={onClose} className="grid h-11 w-11 place-items-center border border-white/25 text-white transition hover:border-[#e4b8a8] hover:text-[#e4b8a8]" aria-label="關閉校稿相簿">
-          <X className="h-5 w-5" />
-        </button>
-      </header>
-      <main
-        className="relative flex min-h-0 flex-1 items-center justify-center overflow-auto px-5 pb-4"
-        onTouchStart={(event) => { touchStart.current = event.changedTouches[0]?.clientX ?? null; }}
-        onTouchEnd={(event) => {
-          const start = touchStart.current;
-          const end = event.changedTouches[0]?.clientX;
-          if (start !== null && end !== undefined && Math.abs(start - end) > 50) go(start > end ? 1 : -1);
-          touchStart.current = null;
-        }}
-      >
-        <img src={current.pngUrl || undefined} alt={`${current.pageNumber} ${current.title} 校稿預覽`} className="max-h-full max-w-full origin-center object-contain transition-transform duration-200" style={{ transform: `scale(${zoom})` }} />
-      </main>
-      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-4 sm:px-7">
-        <button onClick={() => go(-1)} disabled={index === 0} className="inline-flex min-h-11 items-center gap-2 border border-white/20 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-30"><ChevronLeft className="h-4 w-4" /> 上一頁</button>
-        <div className="order-last flex w-full items-center justify-center gap-2 sm:order-none sm:w-auto">
-          <button onClick={() => setZoom((value) => Math.max(1, value - 0.25))} className="grid h-10 w-10 place-items-center border border-white/20" aria-label="縮小"><Minus className="h-4 w-4" /></button>
-          <button onClick={() => setZoom((value) => Math.min(2.5, value + 0.25))} className="grid h-10 w-10 place-items-center border border-white/20" aria-label="放大"><Plus className="h-4 w-4" /></button>
-          <button onClick={() => setZoom(1)} className="grid h-10 w-10 place-items-center border border-white/20" aria-label="重設圖片大小"><Maximize2 className="h-4 w-4" /></button>
-          <select value={current.id} onChange={(event) => { setIndex(galleryPages.findIndex((page) => page.id === Number(event.target.value))); setZoom(1); }} className="h-10 max-w-40 border border-white/20 bg-transparent px-2 text-sm text-white outline-none">
-            {galleryPages.map((page) => <option key={page.id} value={page.id} className="bg-[#292621]">{page.pageNumber}</option>)}
-          </select>
-        </div>
-        <button onClick={() => go(1)} disabled={index === galleryPages.length - 1} className="inline-flex min-h-11 items-center gap-2 border border-white/20 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-30">下一頁 <ChevronRight className="h-4 w-4" /></button>
-      </footer>
-    </div>
-  );
+  return <div className="fixed inset-0 z-50 flex flex-col bg-[#171512]/[0.98] text-[#fffaf2]" role="dialog" aria-modal="true" aria-label="校稿相簿"><header className="flex items-center justify-between px-4 py-4 sm:px-7"><div><p className="text-xs font-semibold tracking-[0.18em] text-[#e4b8a8]">校稿相簿</p><p className="mt-1 text-sm text-[#d9d0c4]">{current.pageNumber}／共 {galleryPages.length} 頁　{current.title}</p></div><button onClick={onClose} className="grid h-11 w-11 place-items-center border border-white/25 text-white transition hover:border-[#e4b8a8] hover:text-[#e4b8a8]" aria-label="關閉校稿相簿"><X className="h-5 w-5" /></button></header><main className="relative flex min-h-0 flex-1 items-center justify-center overflow-auto px-5 pb-4" onTouchStart={(event) => { touchStart.current = event.changedTouches[0]?.clientX ?? null; }} onTouchEnd={(event) => { const start = touchStart.current; const end = event.changedTouches[0]?.clientX; if (start !== null && end !== undefined && Math.abs(start - end) > 50) go(start > end ? 1 : -1); touchStart.current = null; }}><img src={current.pngUrl || undefined} alt={`${current.pageNumber} ${current.title} 校稿預覽`} className="max-h-full max-w-full origin-center object-contain transition-transform duration-200" style={{ transform: `scale(${zoom})` }} /></main><footer className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 px-4 py-4 sm:px-7"><button onClick={() => go(-1)} disabled={index === 0} className="inline-flex min-h-11 items-center gap-2 border border-white/20 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-30"><ChevronLeft className="h-4 w-4" />上一頁</button><div className="order-last flex w-full items-center justify-center gap-2 sm:order-none sm:w-auto"><button onClick={() => setZoom((value) => Math.max(1, value - 0.25))} className="grid h-10 w-10 place-items-center border border-white/20" aria-label="縮小"><Minus className="h-4 w-4" /></button><button onClick={() => setZoom((value) => Math.min(2.5, value + 0.25))} className="grid h-10 w-10 place-items-center border border-white/20" aria-label="放大"><Plus className="h-4 w-4" /></button><button onClick={() => setZoom(1)} className="grid h-10 w-10 place-items-center border border-white/20" aria-label="重設圖片大小"><Maximize2 className="h-4 w-4" /></button><select value={current.id} onChange={(event) => { setIndex(galleryPages.findIndex((page) => page.id === Number(event.target.value))); setZoom(1); }} className="h-10 max-w-40 border border-white/20 bg-transparent px-2 text-sm text-white outline-none" aria-label="跳至頁面">{galleryPages.map((page) => <option key={page.id} value={page.id} className="bg-[#292621]">{page.pageNumber}</option>)}</select></div><button onClick={() => go(1)} disabled={index === galleryPages.length - 1} className="inline-flex min-h-11 items-center gap-2 border border-white/20 px-4 text-sm disabled:cursor-not-allowed disabled:opacity-30">下一頁 <ChevronRight className="h-4 w-4" /></button></footer></div>;
 }
