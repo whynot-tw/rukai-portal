@@ -81,3 +81,5 @@
 - [x] 以桌機 viewport 實際擷取首頁版本歷程區塊，確認時間軸橫向連線與卡片文字不互相遮擋；桌機 viewport 已完成預覽擷取，登入後手機長頁亦已保存為 QA 截圖。
 - [x] 以一般使用者已登入 session 的桌機 viewport 實際擷取首頁底部版本歷程區塊，確認 V1–V4 水平連線、節點與文字不互相遮擋；已保存 1280px 登入後長頁 QA 截圖。
 - [x] 以已登入桌機 session 量測版本卡片、時間軸節點與文字區塊的 DOM 座標，確認沒有實際重疊並保存結果；`cards=4`、`line` 存在、`nodeTextOverlap=false`、`cardOverlap=false`。
+- [x] 移除 V1–V4 版本歷程的時間軸連線與節點，恢復上一版單純黑色卡片排列。
+- [x] 驗證桌機與手機版恢復單純卡片後的版面，並保存回復版本 checkpoint；兩種 viewport 均確認 `cards=4`、`absoluteElements=0`、`overlap=false`。
