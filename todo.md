@@ -38,7 +38,8 @@
 - [x] 取得並檢查真實 Google Sheet 的工作進度欄位，建立唯讀匯入流程且不修改原始資料。
 - [x] 取得 Google Drive PNG 校稿頁面的可讀取來源與頁碼 mapping，安全匯入 Portal 顯示；僅掛載經內容核對的 P10、P11，其他候選圖暫不強行對應。
 - [x] 驗證真實頁序、狀態、更新紀錄與 PNG 相簿在 Portal 的展示結果。
-- [ ] 建立可重複執行的 Google Sheet 唯讀同步流程，避免後續以人工 SQL 更新 Portal。
+- [x] 建立可重複執行的 Google Sheet 唯讀同步流程，避免後續以人工 SQL 更新 Portal。
+- [x] 將 Google Sheet 更新紀錄同步改為可更新既有資料的 upsert，並實際驗證 apply 不會覆寫既有 PNG mapping。
 - [x] 在登入後的實際前端驗證 13 筆工作紀錄、5 筆更新資料與 P10／P11 Proof Gallery 顯示。
 - [x] 補充正式匯入與 PNG mapping 的可追溯驗證紀錄。
 - [x] 新增獨立管理員密碼與角色 session，讓一般專案密碼使用者無法查看或進入維護頁面。
