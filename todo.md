@@ -103,3 +103,14 @@
 - [x] 以一般使用者瀏覽器 session 實測首頁／頁面預覽，確認 P14 出現在前台清單並保存可檢查證據；手機 QA 確認 `p14Visible=true`。
 - [x] 依 P14 目前無 PNG 狀態，確認前台顯示正確 placeholder 且不會錯誤開啟校稿相簿；`hasPlaceholder=true`、`p14GalleryTrigger=false`。
 - [x] 完成 P14 前台驗證後建立新的 checkpoint，再完成 P14 修復收尾。
+- [x] 承接 P01–P14 批次上傳測試，依 20260819 Google Drive 資料夾與指定工作紀錄建立 Import Manifest；14/14 檔案核對完成，P03／P10／P11 取代，其餘新增。
+- [x] 在收到「確認開始 P01–P14 上傳測試」前，不執行任何 Portal 上傳、取代、刪除或修改；確認後僅處理 P01–P14，P15、P16 維持排除。
+- [x] 確認後依頁碼執行 P01–P14 上傳／取代、保留原有狀態、完成前台與管理員 QA 及 checkpoint 回報；14/14 成功、API 與前台桌機／手機 QA 通過。
+- [x] 逐頁重核 Google Sheet「最新頁序對照」與 P01–P14 Import Manifest，標出 Portal 既有標題／狀態衝突，不在未確認前改寫頁面 metadata；已建立 `p01-p14-reconcile-report.md`，判定為 `SOURCE_CONFLICT`。
+- [ ] 針對 P09–P13 建立圖片內容配對證據，確認檔名頁碼、前台卡片標題與 PNG 沒有錯置；原始圖面頁碼正確，但 API 交叉核對發現 Portal P09–P13 標題依序錯置，需另行確認 metadata 同步。
+- [x] 以管理員後台抽查批次 PNG mapping 與前台顯示；管理員 QA 14/14 顯示已設定校稿圖，前台桌機／手機 14/14 縮圖可見，但 P09–P13 metadata／PNG 主題錯置仍待確認。
+- [ ] 以 Partial 狀態保存 P01–P14 批次 checkpoint，明確記錄 PNG mapping 已完成、P09–P13 metadata／PNG 主題錯置需另行確認，且不自行改寫 Portal metadata。
+- [ ] 以一般使用者前台逐頁驗證 P09–P13 卡片標題與對應 PNG 圖面主題一致，保存可檢查結果。
+- [ ] 將本批 P01–P14 上傳結果以 Partial 狀態建立新 checkpoint，記錄 SOURCE_CONFLICT、PNG mapping 已完成與 metadata 未同步。
+- [ ] 在 checkpoint 後回填 version id，並再次確認管理員後台與前台仍能讀到 14/14 PNG mapping。
+- [ ] 等待使用者確認是否依 Google Sheet「最新頁序對照」同步 P09–P13 Portal metadata；未確認前不修改標題、章節或排版／資產狀態。
