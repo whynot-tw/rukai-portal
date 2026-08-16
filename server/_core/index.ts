@@ -8,6 +8,10 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import multer from "multer";
+import { storagePut } from "../storage";
+import { hasValidAdminSession, readCookie, ADMIN_SESSION_COOKIE } from "../passwordAuth";
+import { buildProofStorageKey, isSupportedProofMimeType, MAX_PROOF_UPLOAD_SIZE } from "../proofUpload";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -36,6 +40,47 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+
+  const proofUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: MAX_PROOF_UPLOAD_SIZE },
+  });
+
+  app.post("/api/admin/upload-proof", async (req, res) => {
+    const adminToken = readCookie(req.headers.cookie, ADMIN_SESSION_COOKIE);
+    if (!(await hasValidAdminSession(adminToken))) {
+      res.status(403).json({ message: "此功能僅限管理員使用。" });
+      return;
+    }
+
+    proofUpload.single("file")(req, res, async (error) => {
+      if (error) {
+        const message = error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE"
+          ? "圖片不可超過 15 MB。"
+          : error.message || "圖片上傳失敗，請再試一次。";
+        res.status(400).json({ message });
+        return;
+      }
+      if (!req.file) {
+        res.status(400).json({ message: "請先選擇 PNG、JPG 或 WebP 圖片。" });
+        return;
+      }
+      if (!isSupportedProofMimeType(req.file.mimetype)) {
+        res.status(400).json({ message: "只接受 PNG、JPG 或 WebP 圖片。" });
+        return;
+      }
+
+      try {
+        const pageNumber = typeof req.body.pageNumber === "string" ? req.body.pageNumber : "page";
+        const uploaded = await storagePut(buildProofStorageKey(pageNumber, req.file.originalname), req.file.buffer, req.file.mimetype);
+        res.json(uploaded);
+      } catch (uploadError) {
+        console.error("[Proof Upload]", uploadError);
+        res.status(502).json({ message: "圖片儲存服務暫時無法使用，請稍後重試。" });
+      }
+    });
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

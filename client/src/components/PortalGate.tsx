@@ -1,5 +1,5 @@
 import { trpc } from "@/lib/trpc";
-import { KeyRound, Loader2, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Loader2, ShieldCheck } from "lucide-react";
 import { FormEvent, type ReactNode, useState } from "react";
 
 function GateScreen({ children }: { children: ReactNode }) {
@@ -11,7 +11,8 @@ function LoadingGate() {
 }
 
 function PasswordForm({ title, description, label, buttonLabel, error, pending, password, setPassword, submit }: { title: string; description: string; label: string; buttonLabel: string; error?: string; pending: boolean; password: string; setPassword: (value: string) => void; submit: (event: FormEvent) => Promise<void> }) {
-  return <GateScreen><KeyRound className="mb-7 h-9 w-9 text-[#8d3131]" /><p className="mb-3 text-xs font-semibold tracking-[0.2em] text-[#8d3131]">受限專案入口</p><h1 className="font-serif text-3xl leading-tight">{title}</h1><p className="mt-5 max-w-md leading-7 text-[#6a6259]">{description}</p><form className="mt-7" onSubmit={submit}><label className="block text-xs font-semibold tracking-[0.12em] text-[#665d53]">{label}</label><input autoFocus type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2 w-full border border-[#cfc3b5] bg-white px-4 py-3 text-base outline-none transition focus:border-[#8d3131] focus:ring-2 focus:ring-[#8d3131]/10" placeholder="輸入密碼" />{error ? <p role="alert" className="mt-3 text-sm text-[#8d3131]">{error}</p> : null}<button disabled={!password || pending} className="mt-4 flex w-full items-center justify-center gap-2 bg-[#292621] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#8d3131] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]">{pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}{buttonLabel}</button></form></GateScreen>;
+  const [showPassword, setShowPassword] = useState(false);
+  return <GateScreen><KeyRound className="mb-7 h-9 w-9 text-[#8d3131]" /><p className="mb-3 text-xs font-semibold tracking-[0.2em] text-[#8d3131]">受限專案入口</p><h1 className="font-serif text-3xl leading-tight">{title}</h1><p className="mt-5 max-w-md leading-7 text-[#6a6259]">{description}</p><form className="mt-7" onSubmit={submit}><label className="block text-xs font-semibold tracking-[0.12em] text-[#665d53]">{label}</label><div className="relative mt-2"><input autoFocus type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full border border-[#cfc3b5] bg-white px-4 py-3 pr-12 text-base outline-none transition focus:border-[#8d3131] focus:ring-2 focus:ring-[#8d3131]/10" placeholder="輸入密碼" aria-label={label} /><button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute inset-y-0 right-0 grid w-12 place-items-center text-[#6a6259] transition hover:text-[#8d3131]" aria-label={showPassword ? "隱藏密碼" : "顯示密碼"} title={showPassword ? "隱藏密碼" : "顯示密碼"}>{showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}</button></div>{error ? <p role="alert" className="mt-3 text-sm text-[#8d3131]">{error}</p> : null}<button disabled={!password || pending} className="mt-4 flex w-full items-center justify-center gap-2 bg-[#292621] px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-[#8d3131] disabled:cursor-not-allowed disabled:opacity-50 active:scale-[0.98]">{pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}{buttonLabel}</button></form></GateScreen>;
 }
 
 export function PortalGate({ children }: { children: ReactNode }) {
@@ -32,6 +33,6 @@ export function AdminGate({ children }: { children: ReactNode }) {
   const [password, setPassword] = useState("");
   const submit = async (event: FormEvent) => { event.preventDefault(); try { await login.mutateAsync({ password }); setPassword(""); } catch { /* 顯示 API 錯誤 */ } };
   if (status.isLoading) return <LoadingGate />;
-  if (!status.data?.authenticated) return <PasswordForm title="管理員驗證" description="此區僅供專案管理者維護頁序、更新紀錄、校稿對應與版本資料。" label="管理員密碼" buttonLabel="進入管理後台" error={login.error?.message} pending={login.isPending} password={password} setPassword={setPassword} submit={submit} />;
+  if (!status.data?.authenticated) return <PasswordForm title="管理員驗證" description="此區僅供專案管理者維護頁序、更新紀錄、校稿對應與版本資料。管理員密碼不會在網站顯示或提供查詢；若遺失，請由專案安全設定重新設定。" label="管理員密碼" buttonLabel="進入管理後台" error={login.error?.message} pending={login.isPending} password={password} setPassword={setPassword} submit={submit} />;
   return <>{children}</>;
 }
