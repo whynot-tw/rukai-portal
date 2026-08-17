@@ -153,3 +153,10 @@
 - [x] 建立不擴充管理 UI 的受保護 release ZIP 取得機制，缺少已確認 ZIP 時安全回退至既有已發布頁面 ZIP，並以 `X-Portal-Release-Source: legacy-generated` 區分，避免把現有 PNG 自行視為使用者確認發布包。
 - [x] 將 Release Skill v2 的 ZIP 檢查、頁碼 mapping、文字進度、weekly snapshot、一致性 QA、Needs Confirmation 與 GitHub／checkpoint 規則納入交接文件。
 - [x] 更新下載測試與 QA 文件，確認 `rukai-book-latest.zip`、既有頁面預覽／相簿／自動播放、Hero 發布日期及響應式呈現未受破壞；首個實際使用者確認 ZIP 仍待後續提供。
+
+## AI 共同維護指南與視覺調整
+
+- [x] 撰寫一份獨立的 Markdown 文件，說明如何讓其他 AI 共同維護 Portal，涵蓋 GitHub 同步、Release Skill v2、權限隔離與禁止事項；完成 `docs/AI_CO_MAINTENANCE_GUIDE.md`。
+- [x] 將 Hero「下載最新版」按鈕的視覺樣式改為與「開啟校稿相簿」一致的酒紅色背景（`bg-[#8d3131]`），不改變其功能與自動日期。
+- [x] 執行 TypeScript、Vitest 與視覺 QA，確認按鈕樣式已變更且下載功能正常；TypeScript 通過、19 項 Vitest 通過、Hero 視覺與下載 HTTP 200 QA 通過。
+- [ ] 將本輪變更同步至 GitHub，並保存正式 checkpoint。
