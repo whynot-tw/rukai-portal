@@ -122,6 +122,6 @@
 - [x] 為 projectPages 補上可驗證的 assetVersion 與 reviewStatus 欄位，並以 schema-first 方式完成安全 migration；migration `0002_strong_bucky.sql` 已套用，既有頁面 reviewStatus 預設為「待校稿」。
 - [x] 重新驗證 P09–P13 metadata 同步後的 pngUrl、pngUpdatedAt、assetVersion、reviewStatus 與 sortOrder，確認 metadata 同步不會覆寫校稿狀態；資料庫查詢與前台／管理員 QA 均通過。
 - [x] 保存並發布 P09–P13 metadata 同步、assetVersion／reviewStatus migration 與完整 QA 的新 checkpoint，記錄可繼續校稿條件。
-- [ ] 檢查目前 GitHub repository、remote、分支與未提交變更，確認不會覆蓋其他人的工作。
-- [ ] 建立 AI 接手維護文件，涵蓋架構、環境變數、資料模型、權限、Google Drive／PNG 批次流程、Import Manifest、QA、checkpoint 與禁止事項。
+- [x] 檢查目前 GitHub repository、remote、分支與未提交變更，確認不會覆蓋其他人的工作；GitHub 初始提交已以 unrelated history 安全合併，未覆蓋 WebDev origin。
+- [x] 建立 AI 接手維護文件，涵蓋架構、環境變數、資料模型、權限、Google Drive／PNG 批次流程、Import Manifest、QA、checkpoint 與禁止事項；新增 `README.md` 與 `docs/AI_HANDOFF.md`。
 - [ ] 將最新程式、schema migration、todo 與維護文件同步提交至 GitHub，並驗證遠端內容與 commit。
