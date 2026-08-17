@@ -159,4 +159,4 @@
 - [x] 撰寫一份獨立的 Markdown 文件，說明如何讓其他 AI 共同維護 Portal，涵蓋 GitHub 同步、Release Skill v2、權限隔離與禁止事項；完成 `docs/AI_CO_MAINTENANCE_GUIDE.md`。
 - [x] 將 Hero「下載最新版」按鈕的視覺樣式改為與「開啟校稿相簿」一致的酒紅色背景（`bg-[#8d3131]`），不改變其功能與自動日期。
 - [x] 執行 TypeScript、Vitest 與視覺 QA，確認按鈕樣式已變更且下載功能正常；TypeScript 通過、19 項 Vitest 通過、Hero 視覺與下載 HTTP 200 QA 通過。
-- [ ] 將本輪變更同步至 GitHub，並保存正式 checkpoint。
+- [x] 將本輪變更同步至 GitHub，並保存正式 checkpoint；GitHub `main` 已同步至 `6a0e3c5`。
