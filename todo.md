@@ -144,5 +144,5 @@
 - [x] 將 V1–V4 版本歷程改為 V4 Current → V3 → V2 → V1，保留日期、說明與目前版本標示。
 - [x] 不擴充管理員後台、ZIP 管理、timestamp／版本 ID、Drive 同步或排程功能，並確認既有下載、自動日期與管理員圖檔功能未受破壞。
 - [x] 完成 TypeScript、既有 Vitest、功能 QA 與 Desktop／Mobile／Tablet responsive QA；TypeScript 通過、17 項 Vitest 通過、Desktop 已登入功能 QA、Mobile／Tablet 入口 responsive QA 通過，並保存 `docs/ui-convergence-qa.md`。
-- [ ] 將本輪完成狀態同步至 GitHub，保留清楚的正式 commit／checkpoint 紀錄。
+- [x] 將本輪完成狀態同步至 GitHub，保留清楚的正式 commit／checkpoint 紀錄；GitHub `main` 已同步至 `018ea05`。
 - [x] 依本輪指定基準，將既有最新 weekly snapshot 的 `latestPageOrder` 更新為 P16；不改寫頁面 PNG、校稿或確認狀態。
