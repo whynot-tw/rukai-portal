@@ -108,8 +108,8 @@ export const appRouter = router({
     }),
     dashboard: publicProcedure.query(async ({ ctx }) => {
       await requirePortalAccess(ctx.req);
-      const [allPages, updateRows, snapshots] = await Promise.all([listPages(), listUpdates(5), listWeeklySnapshots()]);
-      const updates = sortUpdatesNewestFirst(updateRows).slice(0, 5);
+      const [allPages, updateRows, snapshots] = await Promise.all([listPages(), listUpdates(), listWeeklySnapshots()]);
+      const updates = sortUpdatesNewestFirst(updateRows);
       return {
         project: { title: portalProject.title, currentBaseline: portalProject.currentBaseline, baselineUpdatedAt: portalProject.baselineUpdatedAt },
         versions: versionStages,
@@ -117,7 +117,7 @@ export const appRouter = router({
         attentionPages: allPages.filter(isAttentionItem).map(toClientPage),
         recentUpdates: updates.map(toClientUpdate),
         latestUpdate: updates[0] ? toClientUpdate(updates[0]) : null,
-        weeklyProgress: snapshots[0] ? { completedChapters: snapshots[0].completedChapters, completedPages: snapshots[0].completedPages, nextStage: snapshots[0].nextStage } : null,
+        weeklyProgress: snapshots[0] ? { completedChapters: snapshots[0].completedChapters, completedPages: snapshots[0].completedPages, latestPageOrder: snapshots[0].latestPageOrder, nextStage: snapshots[0].nextStage } : null,
         summary: summarizePages(allPages),
       };
     }),

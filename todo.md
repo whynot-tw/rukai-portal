@@ -134,3 +134,15 @@
 - [x] 讓 Hero 下載按鈕日期自動取用最新正式 Portal 發布日期，移除手動日期常數；改讀 WebDev 自動產生的 `/__manus__/version.json` timestamp。
 - [x] 讓最新版 ZIP 不再帶手動日期，改用唯一固定檔名 `rukai-handbook-latest.zip`，不建立 ZIP 版本管理。
 - [x] 補上發布日期格式化與前後端回歸測試，驗證 Hero、下載端點與 ZIP 內容仍正確；TypeScript 與 17 項 Vitest 通過，瀏覽器 Hero／下載回歸通過。
+
+## 本輪 UI／資訊架構收斂｜Maintenance Mode
+
+- [x] 將首頁「目前進度」由三組 task 數字改為實際手冊排版進度，顯示目前排版更新至頁碼，保留簡潔輔助資訊。
+- [x] 保留頁面預覽、既有縮圖／頁碼／名稱／狀態／圖片 mapping 與完整校稿相簿，不改變既有資料與校稿入口。
+- [x] 在完整校稿相簿加入預設關閉、每約 5 秒前往下一頁、到最後停止、手動翻頁立即停止的自動播放／暫停控制。
+- [x] 將「最近更新」改為預設收合、可展開與再次收合，保留完整既有更新紀錄且不與 V1–V4 區塊合併。
+- [x] 將 V1–V4 版本歷程改為 V4 Current → V3 → V2 → V1，保留日期、說明與目前版本標示。
+- [x] 不擴充管理員後台、ZIP 管理、timestamp／版本 ID、Drive 同步或排程功能，並確認既有下載、自動日期與管理員圖檔功能未受破壞。
+- [x] 完成 TypeScript、既有 Vitest、功能 QA 與 Desktop／Mobile／Tablet responsive QA；TypeScript 通過、17 項 Vitest 通過、Desktop 已登入功能 QA、Mobile／Tablet 入口 responsive QA 通過，並保存 `docs/ui-convergence-qa.md`。
+- [ ] 將本輪完成狀態同步至 GitHub，保留清楚的正式 commit／checkpoint 紀錄。
+- [x] 依本輪指定基準，將既有最新 weekly snapshot 的 `latestPageOrder` 更新為 P16；不改寫頁面 PNG、校稿或確認狀態。
