@@ -1,7 +1,7 @@
 import { zipSync } from "fflate";
 import { listPages } from "./db";
 import { storageGetSignedUrl } from "./storage";
-export const LATEST_DOWNLOAD_FILENAME = "rukai-handbook-latest.zip";
+export const LATEST_DOWNLOAD_FILENAME = "rukai-book-latest.zip";
 
 export function normalizePageFileName(pageNumber: string) {
   const safePageNumber = pageNumber.replace(/[^A-Za-z0-9_-]/g, "_");

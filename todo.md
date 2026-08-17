@@ -146,3 +146,10 @@
 - [x] 完成 TypeScript、既有 Vitest、功能 QA 與 Desktop／Mobile／Tablet responsive QA；TypeScript 通過、17 項 Vitest 通過、Desktop 已登入功能 QA、Mobile／Tablet 入口 responsive QA 通過，並保存 `docs/ui-convergence-qa.md`。
 - [x] 將本輪完成狀態同步至 GitHub，保留清楚的正式 commit／checkpoint 紀錄；GitHub `main` 已同步至 `61e9b44`。
 - [x] 依本輪指定基準，將既有最新 weekly snapshot 的 `latestPageOrder` 更新為 P16；不改寫頁面 PNG、校稿或確認狀態。
+
+## Rukai Portal Release Skill v2｜ZIP 直傳發布流程
+
+- [x] 將最新版下載契約改為使用者確認的唯一 `rukai-book-latest.zip`，不再由 Portal 動態重建 ZIP，且保留既有 Hero 自動發布日期；在首個確認 ZIP 上傳前維持既有下載相容輸出。
+- [x] 建立不擴充管理 UI 的受保護 release ZIP 取得機制，缺少已確認 ZIP 時安全回退至既有已發布頁面 ZIP，並以 `X-Portal-Release-Source: legacy-generated` 區分，避免把現有 PNG 自行視為使用者確認發布包。
+- [x] 將 Release Skill v2 的 ZIP 檢查、頁碼 mapping、文字進度、weekly snapshot、一致性 QA、Needs Confirmation 與 GitHub／checkpoint 規則納入交接文件。
+- [x] 更新下載測試與 QA 文件，確認 `rukai-book-latest.zip`、既有頁面預覽／相簿／自動播放、Hero 發布日期及響應式呈現未受破壞；首個實際使用者確認 ZIP 仍待後續提供。

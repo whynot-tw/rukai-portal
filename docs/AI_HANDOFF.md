@@ -26,6 +26,7 @@
 | `server/db.ts` | projectPages、projectUpdates 等資料庫查詢與保存邏輯 |
 | `server/portalContent.ts` | Portal 公開內容、版本摘要及公開欄位轉換 |
 | `server/proofUpload.ts` | PNG 檔名清理與 storage key 產生器 |
+| `server/releaseZip.ts` | Release Skill v2 的固定最新 ZIP 驗證、儲存與讀取 |
 | `server/_core/index.ts` | Express 啟動與 `/api/admin/upload-proof` 上傳端點 |
 | `drizzle/schema.ts` | 資料模型；目前包含 `assetVersion` 與 `reviewStatus` |
 | `drizzle/0002_strong_bucky.sql` | 新增 `assetVersion`、`reviewStatus` 的 migration |
@@ -78,6 +79,12 @@
 ## 11. 禁止事項
 
 不得捏造頁面、評論、校稿結果、使用者確認或任何圖片內容。不得未經確認批次上傳、取代、刪除或同步 metadata。不得把 Google Drive 的缺頁當成 Portal 刪除指令。不得把 asset upload 當成 review approval。不得在公開 API 暴露管理欄位或密碼。不得將大型資產放入 Git repository；圖片應由 WebDev storage／S3 管理。
+
+## 11A. Release Skill v2｜ZIP 直傳正式發布
+
+後續正式發布以使用者已確認的 `rukai-book-latest.zip` 與已確認更新內容紀錄為準，不重新掃描 Google Drive 或自行產生另一份專案判斷。ZIP 必須只包含根目錄的 `PXX.png` 頁面檔；先檢查解壓、頁碼、重複與無法辨識檔名，再依頁碼更新 Portal。缺頁預設保留既有頁面，不能當成刪除；衝突、同頁多檔或進度不一致一律列為 `Needs Confirmation`。
+
+唯一 release ZIP 的固定名稱為 `rukai-book-latest.zip`，由 `server/releaseZip.ts` 存放於固定 storage key；每次通過確認的發布會直接覆寫前一份，不保留 ZIP 歷史或日期檔名。Hero 日期仍由 `/__manus__/version.json` 自動取得。未收到第一份使用者確認 ZIP 前，既有下載端點會相容產生目前頁面 ZIP，但不得將該相容包描述為使用者提交的發布來源。完整流程請先讀取 `docs/RELEASE_SKILL_V2.md`。
 
 ## 12. 建議接手順序
 

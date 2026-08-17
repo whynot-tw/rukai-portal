@@ -14,6 +14,12 @@ import { hasValidAdminSession, readCookie, ADMIN_SESSION_COOKIE } from "../passw
 import { buildProofStorageKey, isSupportedProofMimeType, MAX_PROOF_UPLOAD_SIZE } from "../proofUpload";
 import { buildLatestProofZip, LATEST_DOWNLOAD_FILENAME } from "../latestDownload";
 import { hasValidPortalSession, PORTAL_SESSION_COOKIE } from "../passwordAuth";
+import {
+  getLatestReleaseZip,
+  LATEST_RELEASE_FILENAME,
+  MAX_RELEASE_UPLOAD_SIZE,
+  storeLatestReleaseZip,
+} from "../releaseZip";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -47,6 +53,10 @@ async function startServer() {
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_PROOF_UPLOAD_SIZE },
   });
+  const releaseZipUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: MAX_RELEASE_UPLOAD_SIZE },
+  });
 
   app.get("/api/portal/download-latest", async (req, res) => {
     const portalToken = readCookie(req.headers.cookie, PORTAL_SESSION_COOKIE);
@@ -56,17 +66,53 @@ async function startServer() {
     }
 
     try {
-      const { bytes, pageCount } = await buildLatestProofZip();
+      const releaseZip = await getLatestReleaseZip();
+      // 第一份已確認 release ZIP 上傳前，保留舊有已發布頁面的相容下載。
+      const download = releaseZip ?? await buildLatestProofZip();
       res.setHeader("Content-Type", "application/zip");
-      res.setHeader("Content-Length", String(bytes.byteLength));
+      res.setHeader("Content-Length", String(download.bytes.byteLength));
       res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(LATEST_DOWNLOAD_FILENAME)}`);
       res.setHeader("Cache-Control", "private, no-store");
-      res.setHeader("X-Portal-Page-Count", String(pageCount));
-      res.send(Buffer.from(bytes));
+      res.setHeader("X-Portal-Page-Count", String(download.pageCount));
+      res.setHeader("X-Portal-Release-Source", releaseZip ? "uploaded-release" : "legacy-generated");
+      res.send(Buffer.from(download.bytes));
     } catch (downloadError) {
       console.error("[Latest Proof ZIP]", downloadError);
       res.status(502).json({ message: "最新版頁面圖檔目前無法整理，請稍後再試。" });
     }
+  });
+
+  app.post("/api/admin/upload-release-zip", async (req, res) => {
+    const adminToken = readCookie(req.headers.cookie, ADMIN_SESSION_COOKIE);
+    if (!(await hasValidAdminSession(adminToken))) {
+      res.status(403).json({ message: "此功能僅限管理員使用。" });
+      return;
+    }
+
+    releaseZipUpload.single("file")(req, res, async (error) => {
+      if (error) {
+        const message = error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE"
+          ? "最新版 ZIP 不可超過 300 MB。"
+          : error.message || "最新版 ZIP 上傳失敗，請再試一次。";
+        res.status(400).json({ message });
+        return;
+      }
+      if (!req.file) {
+        res.status(400).json({ message: "請提供已確認的 rukai-book-latest.zip。" });
+        return;
+      }
+      if (req.file.originalname !== LATEST_RELEASE_FILENAME) {
+        res.status(400).json({ message: `發布 ZIP 檔名必須為 ${LATEST_RELEASE_FILENAME}。` });
+        return;
+      }
+      try {
+        const release = await storeLatestReleaseZip(req.file.buffer);
+        res.json(release);
+      } catch (releaseError) {
+        const message = releaseError instanceof Error ? releaseError.message : "最新版 ZIP 無法發布，請再試一次。";
+        res.status(400).json({ message });
+      }
+    });
   });
 
   app.post("/api/admin/upload-proof", async (req, res) => {

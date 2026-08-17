@@ -67,7 +67,7 @@ export default function Home() {
       const objectUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = objectUrl;
-      link.download = "魯凱文化手冊-最新版頁面圖檔.zip";
+      link.download = "rukai-book-latest.zip";
       document.body.appendChild(link);
       link.click();
       link.remove();
