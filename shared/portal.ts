@@ -8,7 +8,10 @@ export const PAGE_STATUS_OPTIONS = [
   "頁序尚未鎖定",
 ] as const;
 
-export const ASSET_STATUS_OPTIONS = ["齊全", "缺電子檔", "待製作"] as const;
+export const LATEST_DOWNLOAD_DATE = "2026/08/17";
+
+export const LAYOUT_STATUS_OPTIONS = ["齊全", "缺電子檔", "待製作"] as const;
+export const ASSET_STATUS_OPTIONS = LAYOUT_STATUS_OPTIONS;
 
 export const ATTENTION_STATUSES = [
   "待確認",

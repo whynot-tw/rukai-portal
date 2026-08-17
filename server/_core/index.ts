@@ -12,6 +12,8 @@ import multer from "multer";
 import { storagePut } from "../storage";
 import { hasValidAdminSession, readCookie, ADMIN_SESSION_COOKIE } from "../passwordAuth";
 import { buildProofStorageKey, isSupportedProofMimeType, MAX_PROOF_UPLOAD_SIZE } from "../proofUpload";
+import { buildLatestProofZip, LATEST_DOWNLOAD_FILENAME } from "../latestDownload";
+import { hasValidPortalSession, PORTAL_SESSION_COOKIE } from "../passwordAuth";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -44,6 +46,27 @@ async function startServer() {
   const proofUpload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_PROOF_UPLOAD_SIZE },
+  });
+
+  app.get("/api/portal/download-latest", async (req, res) => {
+    const portalToken = readCookie(req.headers.cookie, PORTAL_SESSION_COOKIE);
+    if (!(await hasValidPortalSession(portalToken))) {
+      res.status(401).json({ message: "請先輸入專案存取密碼。" });
+      return;
+    }
+
+    try {
+      const { bytes, pageCount } = await buildLatestProofZip();
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader("Content-Length", String(bytes.byteLength));
+      res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(LATEST_DOWNLOAD_FILENAME)}`);
+      res.setHeader("Cache-Control", "private, no-store");
+      res.setHeader("X-Portal-Page-Count", String(pageCount));
+      res.send(Buffer.from(bytes));
+    } catch (downloadError) {
+      console.error("[Latest Proof ZIP]", downloadError);
+      res.status(502).json({ message: "最新版頁面圖檔目前無法整理，請稍後再試。" });
+    }
   });
 
   app.post("/api/admin/upload-proof", async (req, res) => {

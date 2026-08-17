@@ -125,3 +125,8 @@
 - [x] 檢查目前 GitHub repository、remote、分支與未提交變更，確認不會覆蓋其他人的工作；GitHub 初始提交已以 unrelated history 安全合併，未覆蓋 WebDev origin。
 - [x] 建立 AI 接手維護文件，涵蓋架構、環境變數、資料模型、權限、Google Drive／PNG 批次流程、Import Manifest、QA、checkpoint 與禁止事項；新增 `README.md` 與 `docs/AI_HANDOFF.md`。
 - [x] 將最新程式、schema migration、todo 與維護文件同步提交至 GitHub，並驗證遠端內容與 commit；本地與 GitHub `main` 同為 `88ece8e89ee22d452edefa701e344e7de6056a69`，必要檔案均存在且工作樹乾淨。
+
+- [x] 在 Hero 新增「下載最新版（2026/08/17）」按鈕，維持全繁體中文且不顯示 ZIP 實際檔名。
+- [x] 建立目前所有頁面圖檔的一份最新版 ZIP；下載包由目前資料庫頁面 PNG 即時衍生，不建立 ZIP 版本管理、不保存舊包，也不取代 Source of Truth。
+- [x] 新增安全下載端點與前台下載狀態，明確將 ZIP 視為方便下載的衍生包，不作為 Source of Truth；未登入端點回傳 401。
+- [x] 驗證 ZIP 內容涵蓋目前所有可下載頁面圖檔、下載端點、桌機／手機 Hero 顯示、TypeScript 與 Vitest；HTTP 200、14 個檔案、TypeScript 通過、17 項 Vitest 通過，並保存 `docs/latest-download-qa.md`。
