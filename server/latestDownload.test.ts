@@ -1,15 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
-  LATEST_DOWNLOAD_DATE,
   LATEST_DOWNLOAD_FILENAME,
   normalizePageFileName,
   storageKeyFromUrl,
 } from "./latestDownload";
+import { formatPublishedDate } from "@shared/portal";
 
 describe("最新版頁面圖檔下載包", () => {
   it("使用本次正式 Portal 更新日期與單一固定下載檔名", () => {
-    expect(LATEST_DOWNLOAD_DATE).toBe("2026/08/17");
-    expect(LATEST_DOWNLOAD_FILENAME).toBe("rukai-handbook-latest-2026-08-17.zip");
+    expect(LATEST_DOWNLOAD_FILENAME).toBe("rukai-handbook-latest.zip");
+    expect(formatPublishedDate(Date.UTC(2026, 7, 17, 2, 0, 0))).toBe("2026/08/17");
+    expect(formatPublishedDate(Number.NaN)).toBeNull();
   });
 
   it("將頁碼轉成安全且可讀的 PNG 檔名", () => {

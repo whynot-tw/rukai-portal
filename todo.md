@@ -130,3 +130,7 @@
 - [x] 建立目前所有頁面圖檔的一份最新版 ZIP；下載包由目前資料庫頁面 PNG 即時衍生，不建立 ZIP 版本管理、不保存舊包，也不取代 Source of Truth。
 - [x] 新增安全下載端點與前台下載狀態，明確將 ZIP 視為方便下載的衍生包，不作為 Source of Truth；未登入端點回傳 401。
 - [x] 驗證 ZIP 內容涵蓋目前所有可下載頁面圖檔、下載端點、桌機／手機 Hero 顯示、TypeScript 與 Vitest；HTTP 200、14 個檔案、TypeScript 通過、17 項 Vitest 通過，並保存 `docs/latest-download-qa.md`。
+
+- [x] 讓 Hero 下載按鈕日期自動取用最新正式 Portal 發布日期，移除手動日期常數；改讀 WebDev 自動產生的 `/__manus__/version.json` timestamp。
+- [x] 讓最新版 ZIP 不再帶手動日期，改用唯一固定檔名 `rukai-handbook-latest.zip`，不建立 ZIP 版本管理。
+- [x] 補上發布日期格式化與前後端回歸測試，驗證 Hero、下載端點與 ZIP 內容仍正確；TypeScript 與 17 項 Vitest 通過，瀏覽器 Hero／下載回歸通過。
