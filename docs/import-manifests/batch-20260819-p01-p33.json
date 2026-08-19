@@ -1,0 +1,59 @@
+{
+  "batchId": "batch-20260819-p01-p33",
+  "sourceFile": "rukai-book-latest.zip",
+  "sourceSha256": "a5d52930e997e4f66b1f294bb1ae68926fc94420b021c0c08fc50c11dedf9566",
+  "userAuthorization": "使用者明確要求：請依序更新最新版",
+  "sourceScope": "ZIP 內 33 張 P01.png–P33.png；外層資料夾與盤點附件僅作來源包裝／核對資料，不匯入 Portal",
+  "normalization": "已核對後只取根目錄語意下的 PXX.png 建立 canonical release ZIP；不修改原始附件",
+  "batchWarnings": [
+    {
+      "code": "SOURCE_WRAPPER",
+      "severity": "warning",
+      "pages": ["P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08", "P09", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17", "P18", "P19", "P20", "P21", "P22", "P23", "P24", "P25", "P26", "P27", "P28", "P29", "P30", "P31", "P32", "P33"],
+      "message": "使用者 ZIP 含外層資料夾與盤點附件；已在不改動原始 ZIP 的前提下只取 33 張 PNG 正規化。",
+      "blocksRelease": false
+    },
+    {
+      "code": "PENDING_PAGE_EDITS",
+      "severity": "warning",
+      "pages": ["P03", "P04", "P05", "P23", "P32"],
+      "message": "盤點表列出頁碼最後排或缺原始圖檔；PNG 可先更新，但頁面仍標示待修改／待人工處理，不自動宣稱已完成。",
+      "blocksRelease": false
+    }
+  ],
+  "files": [
+    {"pageNumber":"P01","title":"榮耀之冠 百合之約｜封面","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P02","title":"前言","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P03","title":"目錄","plannedAction":"replace","reviewStatus":"待修改","confirmationRequired":false,"note":"頁碼最後排"},
+    {"pageNumber":"P04","title":"目錄（續）","plannedAction":"replace","reviewStatus":"待修改","confirmationRequired":false,"note":"頁碼最後排"},
+    {"pageNumber":"P05","title":"目錄（續）","plannedAction":"replace","reviewStatus":"待修改","confirmationRequired":false,"note":"頁碼最後排"},
+    {"pageNumber":"P06","title":"魯凱族分布圖","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P07","title":"霧台鄉大武部落位置圖","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P08","title":"魯凱族支系圖","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P09","title":"秩序是魯凱文化的靈魂","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P10","title":"秩序是魯凱文化的靈魂（續）／四項文化主軸","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P11","title":"社會階級：所有禮儀的基礎","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P12","title":"階級／姓氏階級：大武部落命名及身分象徵使用規範","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P13","title":"婚禮：家族、階級與權力交換的儀式","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P14","title":"第一步｜男女社交 makilialilase","plannedAction":"replace","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P15","title":"第二步｜示愛 muapalapalange","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P16","title":"第三步｜探婚 kiathiathingale","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P17","title":"第四步｜議婚 kiadrekase","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P18","title":"第五步｜驗聘禮、訂婚 mapaceceele、tuasiasilanga／第六步｜結婚 tualrewege","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P19","title":"第六步｜結婚 tualrewege（續）","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P20","title":"成為適婚女性的能力養成教育：一針一線織出幸福／成為適婚男性的能力養成教育：生活中的技能培養","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P21","title":"禁婚範圍｜傳統婚俗中的倫理秩序","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P22","title":"婚前最後的道別｜哭別 kiapatatubi","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P23","title":"哭別中的祝福 sapakitatubia","plannedAction":"add","reviewStatus":"待修改","confirmationRequired":true,"note":"缺原始圖檔：背帶 pila、網袋 kadrai"},
+    {"pageNumber":"P24","title":"解開幸福的第一道考驗｜拆線 mwacaisi","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P25","title":"拆線 mwacaisi（續）","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P26","title":"婚禮禮俗與聘禮文化","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P27","title":"婚禮禮俗與聘禮文化（續）","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P28","title":"紅心百合","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P29","title":"黃水茄花飾","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P30","title":"琉璃珠項鍊套飾於陶壺","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P31","title":"陶壺","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false},
+    {"pageNumber":"P32","title":"甕","plannedAction":"add","reviewStatus":"待修改","confirmationRequired":true,"note":"缺原始圖檔：pangasilri、lrilwal uase"},
+    {"pageNumber":"P33","title":"禮刀","plannedAction":"add","reviewStatus":"待校稿","confirmationRequired":false}
+  ]
+}
