@@ -7,10 +7,17 @@ export const portalProject = {
 
 export const versionStages = [
   {
-    stage: "V0",
-    date: "2026/02/08",
-    title: "第一階段完稿",
-    details: "111 頁舊版；原初稿 PDF。",
+    stage: "V3",
+    date: "2026/08/03",
+    title: "大綱確認版本",
+    details: "章序、標題與內容順序以 0803 大綱確認版本為準。0803 確認版內文曾收件，後續由王老師收回，目前不作為可用施工來源。正文改以目前持有且可驗證的來源逐頁核對。",
+    isCurrent: true,
+  },
+  {
+    stage: "V2",
+    date: "2026/07/31–08/01",
+    title: "電子檔提供與現場頁序確認",
+    details: "7/31 與 8/1 視為同一內容版本階段；現場以紙本做少量修正與頁序確認。",
     isCurrent: false,
   },
   {
@@ -21,17 +28,10 @@ export const versionStages = [
     isCurrent: false,
   },
   {
-    stage: "V2",
-    date: "2026/07/31–08/01",
-    title: "電子檔提供與現場頁序確認",
-    details: "7/31 與 8/1 視為同一內容版本階段；現場以紙本做少量修正與頁序確認。",
+    stage: "V0",
+    date: "2026/02/08",
+    title: "第一階段完稿",
+    details: "111 頁舊版；原初稿 PDF。",
     isCurrent: false,
-  },
-  {
-    stage: "V3",
-    date: "2026/08/03",
-    title: "大綱確認版本",
-    details: "章序、標題與內容順序以 0803 大綱確認版本為準。0803 確認版內文曾收件，後續由王老師收回，目前不作為可用施工來源。正文改以目前持有且可驗證的來源逐頁核對。",
-    isCurrent: true,
   },
 ];

@@ -184,3 +184,9 @@
 - [x] 修正 V3 版本文案，明確標示 0803 內文已收回、不作為可用施工來源；同步 import note newline 規則與 P01–P33 Manifest。
 - [x] 執行 P01–P33 mapping、下載、相簿、登入／Admin、375／768／Desktop QA，確認無水平溢出與功能回歸；TypeScript、19 項 Vitest、DOM、相簿、375／768 QA 通過。
 - [x] 將本輪改版同步 GitHub main，建立正式 checkpoint 並標示維護模式狀態；GitHub `main` 與本地同為 `c740a05`。
+
+## 版本歷程與 8/19 待處理修正
+
+- [x] 將版本歷程恢復為倒敘：V3 Current → V2 → V1 → V0，保留所有版本日期與說明。
+- [x] 將 2026-08-19 更新紀錄中的 P01 原始檔限制、P03–P05 頁碼最後排、P23／P32 缺原始圖檔等具體事項完整拆入待處理區塊；不刪除原更新紀錄，待處理頁面目前為 6 頁。
+- [ ] 執行版本排序、待處理內容、P01–P33 mapping、下載、相簿、權限與 Desktop／Mobile／Tablet 回歸 QA，完成後同步 GitHub 與建立修正版 checkpoint；版本／待處理／P01–P33／下載／相簿／權限／Desktop／375px／768px QA 已通過，GitHub 與 checkpoint 尚待最後處理。
