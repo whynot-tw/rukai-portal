@@ -166,4 +166,4 @@
 - [x] 核對使用者提供的 `rukai-book-latest.zip` 與 P01–P33 修改盤點表，確認 33 張 PNG、外層資料夾包裝、盤點附件、無重複頁碼與缺頁；原始 ZIP SHA-256 已記錄於 `docs/p01-p33-qa.md`。
 - [x] 建立 P01–P33 Import Manifest，將 P03–P05「頁碼最後排」、P23／P32 缺原始圖檔標為待人工處理，不自行補造或判定完成；完成 `docs/import-manifests/batch-20260819-p01-p33.json`。
 - [x] 依確認結果更新 Portal 可見頁面圖檔與必要頁序／進度資料，P01–P14 替換、P15–P33 新增，首頁進度更新至 P33，reviewStatus 與待修改事項保持分離。
-- [ ] 執行 ZIP 內容、頁碼 mapping、Portal 頁面、權限、相簿、下載與 Desktop／Mobile／Tablet QA，並同步 GitHub 與建立 checkpoint；前述 ZIP／Portal／下載／響應式 QA 已完成，GitHub 與 checkpoint 尚待最後處理。
+- [x] 執行 ZIP 內容、頁碼 mapping、Portal 頁面、權限、相簿、下載與 Desktop／Mobile／Tablet QA，並同步 GitHub 與建立 checkpoint；ZIP／Portal／下載／響應式 QA 已完成，TypeScript 與 19 項 Vitest 通過，GitHub `main` 已同步至 `bf4a128`。
