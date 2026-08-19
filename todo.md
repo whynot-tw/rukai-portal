@@ -183,4 +183,4 @@
 - [x] 分離校稿歷程與更新歷程，沿用既有 projectUpdates；最新校稿／更新記錄預設展開，舊紀錄可折疊；版本歷程完整展開且不折疊。
 - [x] 修正 V3 版本文案，明確標示 0803 內文已收回、不作為可用施工來源；同步 import note newline 規則與 P01–P33 Manifest。
 - [x] 執行 P01–P33 mapping、下載、相簿、登入／Admin、375／768／Desktop QA，確認無水平溢出與功能回歸；TypeScript、19 項 Vitest、DOM、相簿、375／768 QA 通過。
-- [ ] 將本輪改版同步 GitHub main，建立正式 checkpoint 並標示維護模式狀態。
+- [x] 將本輪改版同步 GitHub main，建立正式 checkpoint 並標示維護模式狀態；GitHub `main` 與本地同為 `c740a05`。
