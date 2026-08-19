@@ -167,3 +167,20 @@
 - [x] 建立 P01–P33 Import Manifest，將 P03–P05「頁碼最後排」、P23／P32 缺原始圖檔標為待人工處理，不自行補造或判定完成；完成 `docs/import-manifests/batch-20260819-p01-p33.json`。
 - [x] 依確認結果更新 Portal 可見頁面圖檔與必要頁序／進度資料，P01–P14 替換、P15–P33 新增，首頁進度更新至 P33，reviewStatus 與待修改事項保持分離。
 - [x] 執行 ZIP 內容、頁碼 mapping、Portal 頁面、權限、相簿、下載與 Desktop／Mobile／Tablet QA，並同步 GitHub 與建立 checkpoint；ZIP／Portal／下載／響應式 QA 已完成，TypeScript 與 19 項 Vitest 通過，GitHub `main` 已同步至 `bf4a128`。
+
+## 後台資料庫只讀盤點
+
+- [x] 直接讀取 projectPages、weeklySnapshots 與 projectUpdates 的最新內容；完整輸出已存於本次只讀盤點暫存結果。
+- [x] 交叉核對 P01–P33 的頁碼排序、標題、PNG mapping、assetStatus、reviewStatus、assetVersion 與目前進度：33／33、無重複、無缺 PNG，全部為 `batch-20260819-p01-p33`。
+- [x] 回報後台剛更新的有效內容、疑似矛盾與需要人工確認項目；本次全程只讀，未修改資料、未上傳、未刪除、未發布。
+
+## 2026-08-19 Portal 精簡改版
+
+- [x] 精簡 Hero：保留專案名稱、校稿相簿、下載最新版；移除重複 badge、最近進度欄與多餘 CTA／說明。
+- [x] 將目前進度改為資料計算的三項摘要：排版進度、待處理頁面數、本批版本；移除長說明。
+- [x] 精簡頁面預覽卡，保留縮圖、頁碼、標題、狀態；縮圖直接開啟相簿，移除每卡與區塊重複 CTA。
+- [x] 將「待確認／待提供」改為「待處理事項」，只顯示具體 issue；notes 以換行拆分，每個 issue 獨立呈現，排除單純「排版中」。
+- [x] 分離校稿歷程與更新歷程，沿用既有 projectUpdates；最新校稿／更新記錄預設展開，舊紀錄可折疊；版本歷程完整展開且不折疊。
+- [x] 修正 V3 版本文案，明確標示 0803 內文已收回、不作為可用施工來源；同步 import note newline 規則與 P01–P33 Manifest。
+- [x] 執行 P01–P33 mapping、下載、相簿、登入／Admin、375／768／Desktop QA，確認無水平溢出與功能回歸；TypeScript、19 項 Vitest、DOM、相簿、375／768 QA 通過。
+- [ ] 將本輪改版同步 GitHub main，建立正式 checkpoint 並標示維護模式狀態。

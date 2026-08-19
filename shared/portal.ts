@@ -35,7 +35,22 @@ export type WorkPage = {
   sortOrder: number;
   layoutStatus: string;
   assetStatus: string;
+  reviewStatus?: string | null;
+  notes?: string | null;
 };
+
+const GENERIC_NOTE_LINES = new Set([
+  "排版中",
+  "此頁仍有待確認或待提供項目。",
+  "尚未提供校稿預覽",
+]);
+
+export function issueLines(notes?: string | null) {
+  return (notes ?? "")
+    .split(/\r?\n|[；;、]/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !GENERIC_NOTE_LINES.has(line));
+}
 
 export type PortalAccess = { allowed: boolean; role: "admin" | "client" | null };
 
@@ -59,10 +74,8 @@ export function sortUpdatesNewestFirst<T extends { displayDate: string }>(items:
   return [...items].sort((a, b) => b.displayDate.localeCompare(a.displayDate));
 }
 
-export function isAttentionItem(page: Pick<WorkPage, "layoutStatus" | "assetStatus">) {
-  return ATTENTION_STATUSES.includes(
-    page.layoutStatus as (typeof ATTENTION_STATUSES)[number]
-  ) || ATTENTION_STATUSES.includes(page.assetStatus as (typeof ATTENTION_STATUSES)[number]);
+export function isAttentionItem(page: Pick<WorkPage, "layoutStatus" | "assetStatus" | "reviewStatus" | "notes">) {
+  return page.reviewStatus === "待修改" && issueLines(page.notes).length > 0;
 }
 
 export function summarizePages(pages: WorkPage[]) {

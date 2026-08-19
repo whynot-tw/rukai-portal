@@ -19,6 +19,7 @@ const existingPages = await listPages();
 const existingByPage = new Map(existingPages.map((page) => [page.pageNumber, page]));
 const version = manifest.batchId;
 const results = [];
+const splitIssues = (value) => String(value ?? "").split(/\r?\n|[；;、]/).map((line) => line.trim()).filter(Boolean);
 
 for (const item of manifest.files) {
   const filename = `${item.pageNumber}.png`;
@@ -26,7 +27,7 @@ for (const item of manifest.files) {
   if (!bytes) throw new Error(`Manifest 頁面 ${filename} 不在 canonical ZIP。`);
   const existing = existingByPage.get(item.pageNumber);
   const upload = await storagePut(`rukai-proof/${item.pageNumber.toLowerCase()}/${filename}`, bytes, "image/png");
-  const notes = [existing?.notes, item.note].filter(Boolean).join("；") || null;
+  const notes = [...new Set([...(existing?.notes ? splitIssues(existing.notes) : []), ...(item.note ? splitIssues(item.note) : [])])].join("\n") || null;
   const savedId = await savePage({
     id: existing?.id,
     pageNumber: item.pageNumber,
@@ -54,19 +55,19 @@ for (const item of manifest.files) {
 await saveWeeklySnapshot({
   weekOf: "2026-08-19",
   completedChapters: "P01–P33 最新版頁面圖檔已整理",
-  completedPages: "P01–P33；P03–P05 頁碼最後排；P23／P32 缺原始圖檔待處理",
+  completedPages: "P01–P33\nP03–P05 頁碼最後排\nP23／P32 缺原始圖檔待處理",
   latestPageOrder: "P33",
-  newConfirmations: "P03–P05 頁碼最後排；P23／P32 缺原始圖檔",
+  newConfirmations: "P03–P05 頁碼最後排\nP23／P32 缺原始圖檔",
   resolvedItems: "P01–P33 頁面 PNG 已更新至 Portal",
   versionChanges: version,
-  nextStage: "依盤點表處理 P03–P05 頁碼最後排與 P23／P32 缺原始圖檔",
+  nextStage: "依盤點表處理：\nP03–P05 頁碼最後排\nP23／P32 缺原始圖檔",
 });
 
 await saveUpdate({
   displayDate: "2026-08-19",
   scope: "P01–P33",
   updateType: "最新版 PNG 批次更新",
-  summary: "P01–P33 最新版頁面圖檔已更新；P03–P05 頁碼最後排，P23／P32 尚有缺原始圖檔項目，均保留為待處理狀態。",
+  summary: "P01–P33 最新版頁面圖檔已更新\nP03–P05 頁碼最後排\nP23／P32 尚有缺原始圖檔項目，均保留為待處理狀態。",
   affectedPages: "P01–P33",
   status: "待確認",
 });

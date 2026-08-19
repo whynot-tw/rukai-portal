@@ -45,13 +45,16 @@ function toClientPage(page: Awaited<ReturnType<typeof listPages>>[number]) {
     pageNumber: page.pageNumber,
     title: page.title,
     layoutStatus: page.layoutStatus,
+    assetStatus: page.assetStatus,
+    reviewStatus: page.reviewStatus,
+    notes: page.notes,
     pngUrl: page.pngUrl,
     sortOrder: page.sortOrder,
   };
 }
 
 function toClientUpdate(update: Awaited<ReturnType<typeof listUpdates>>[number]) {
-  return { id: update.id, displayDate: update.displayDate, summary: update.summary, status: update.status };
+  return { id: update.id, displayDate: update.displayDate, summary: update.summary, status: update.status, updateType: update.updateType };
 }
 
 const pageInput = z.object({
@@ -110,13 +113,15 @@ export const appRouter = router({
       await requirePortalAccess(ctx.req);
       const [allPages, updateRows, snapshots] = await Promise.all([listPages(), listUpdates(), listWeeklySnapshots()]);
       const updates = sortUpdatesNewestFirst(updateRows);
+      const clientUpdates = updates.map(toClientUpdate);
       return {
         project: { title: portalProject.title, currentBaseline: portalProject.currentBaseline, baselineUpdatedAt: portalProject.baselineUpdatedAt },
         versions: versionStages,
         pages: allPages.map(toClientPage),
         attentionPages: allPages.filter(isAttentionItem).map(toClientPage),
-        recentUpdates: updates.map(toClientUpdate),
-        latestUpdate: updates[0] ? toClientUpdate(updates[0]) : null,
+        recentUpdates: clientUpdates,
+        proofingUpdates: clientUpdates.filter((update) => update.updateType === "校稿處理"),
+        latestUpdate: clientUpdates[0] ?? null,
         weeklyProgress: snapshots[0] ? { completedChapters: snapshots[0].completedChapters, completedPages: snapshots[0].completedPages, latestPageOrder: snapshots[0].latestPageOrder, nextStage: snapshots[0].nextStage } : null,
         summary: summarizePages(allPages),
       };
